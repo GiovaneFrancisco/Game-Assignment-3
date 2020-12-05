@@ -359,7 +359,6 @@ namespace Assignment2
                 name = pic.Name.Substring(7);
             }
             selectedTile = name;
-            Console.WriteLine(name);
         }
 
         #endregion
@@ -595,8 +594,8 @@ namespace Assignment2
                         {
                             picBox = picList[count];
                             count++;
-                            row = picBox.Left / SIZE;
-                            col = picBox.Top / SIZE;
+                            row = picBox.Top / SIZE;
+                            col = picBox.Left / SIZE;
                             name = picBox.Name;
                             tag = picBox.Tag.ToString();
                             writer.Write(row + "" + col + "" + tag + "\n");
@@ -636,11 +635,11 @@ namespace Assignment2
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnFormClosing(object sender, FormClosingEventArgs e)
-        {
-            Environment.Exit(0);
+        //private void OnFormClosing(object sender, FormClosingEventArgs e)
+        //{
+        //    Environment.Exit(0);
 
-        }
+        //}
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();

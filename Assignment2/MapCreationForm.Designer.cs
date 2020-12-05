@@ -412,7 +412,6 @@ namespace Assignment2
             this.Name = "MapCreationForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Map Creation";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.pnlResources.ResumeLayout(false);
             this.pnlResources.PerformLayout();
             this.panel1.ResumeLayout(false);
