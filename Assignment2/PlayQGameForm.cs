@@ -56,6 +56,10 @@ namespace Assignment2
         {
             this.Close();
         }
+       
+        /// <summary>
+        /// Reads the selected file and sets up the starting grid
+        /// </summary>
         private void LoadMap()
         {
             movements = 0;
@@ -102,14 +106,18 @@ namespace Assignment2
                             }
                             line++;
                         }
+                        //Thread.sleep(10)
                     }
                 }
                 UpdateRemainingBoxes();
                 ChangeEnabledControlButtons(true);
                 //PrintTilesArray();
             }
-            ResizePanel();
         }
+        /// <summary>
+        /// Checks if theres a loaded map
+        /// </summary>
+        /// <returns></returns>
         private bool HasLoadedMap()
         {
             foreach (Control cntrl in pnlLoadTiles.Controls)
@@ -118,17 +126,11 @@ namespace Assignment2
             }
             return false;
         }
-        private void ResizePanel()
-        {
-            if (ROWS > 7)
-            {
-
-            }
-            if (COLS > 7)
-            {
-
-            }
-        }
+        /// <summary>
+        /// Sets the attributes for every picture box created
+        /// </summary>
+        /// <param name="picBox"></param>
+        /// <param name="tile"></param>
         private void SetPictureBoxAttributes(PictureBox picBox, Entity tile)
         {
             picBox.BackgroundImage = tile.Image;
@@ -144,6 +146,11 @@ namespace Assignment2
         #endregion
 
         #region Tile Handling
+        /// <summary>
+        /// Displays the information from a PictureBox (Debbuging only)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DisplayPicInfo(object sender, EventArgs e)
         {
             PictureBox picBox = sender as PictureBox;
@@ -152,12 +159,22 @@ namespace Assignment2
             sb.Append($" Tag: {picBox.Tag}");
             Console.WriteLine(sb);
         }
+        /// <summary>
+        /// Selects a box to be moved
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectTile(object sender, EventArgs e)
         {
             PictureBox picBox = sender as PictureBox;
             DisplayPicInfo(picBox, EventArgs.Empty);
             if (IsTileABox(picBox)) UpdateSelectedBox(picBox);
         }
+        /// <summary>
+        /// Checks if the selected tile is a box
+        /// </summary>
+        /// <param name="picBox"></param>
+        /// <returns></returns>
         private bool IsTileABox(PictureBox picBox)
         {
             if (picBoxMapping[picBox.Top / SIZE, picBox.Left / SIZE] != null)
@@ -167,16 +184,13 @@ namespace Assignment2
             }
             return false;
         }
+        /// <summary>
+        /// Updates the information from the selected box
+        /// </summary>
+        /// <param name="picBox"></param>
         private void UpdateSelectedBox(PictureBox picBox)
         {
             selectedTile = GetSelectedTile();
-            //selectedTile.Location = new Point(picBox.Location.X, picBox.Location.Y);
-            //selectedTile.Name = picBox.Name;
-            //selectedTile.Top = picBox.Top;
-            //selectedTile.Left = picBox.Left;
-            //selectedTile.Tag = picBox.Tag;
-            //selectedTile.BackgroundImage = picBox.BackgroundImage;
-            //selectedTile.BorderStyle = picBox.BorderStyle;
 
             bool hasBoxSelected = false;
             foreach (Control pic in pnlLoadTiles.Controls)
@@ -200,10 +214,10 @@ namespace Assignment2
             }
             //ChangeCntrlButtonsActive(picBox);
         }
-        private PictureBox GetTile(int row, int col)
-        {
-            return picBoxMapping[row, col];
-        }
+        /// <summary>
+        /// Gets the selected tyle
+        /// </summary>
+        /// <returns>PictureBox selected tyle</returns>
         private PictureBox GetSelectedTile()
         {
             PictureBox selected = null;
@@ -220,6 +234,13 @@ namespace Assignment2
             }
             return selected;
         }
+        /// <summary>
+        /// Sets the tag from the selected tyle
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="tileTag"></param>
+        /// <param name="position"></param>
+        /// <returns>Entity class depending on the tag</returns>
         private static Entity SetTileTag(Entity tile, string tileTag, Location position)
         {
             switch (tileTag)
@@ -249,7 +270,10 @@ namespace Assignment2
         #endregion
 
         #region Control Buttons
-
+        /// <summary>
+        /// Changed the enabled property from the control buttons
+        /// </summary>
+        /// <param name="enabled"></param>
         private void ChangeEnabledControlButtons(bool enabled)
         {
             foreach (Control button in pnlCntrlButtons.Controls)
@@ -260,24 +284,11 @@ namespace Assignment2
 
             }
         }
-
-        private void ChangeCntrlButtonsActive(PictureBox picBox)
-        {
-            {
-                foreach (Control button in pnlCntrlButtons.Controls)
-                {
-                    Button dummy = button as Button;
-                    if (picBox.BorderStyle == BorderStyle.Fixed3D)
-                    {
-                        dummy.Enabled = true;
-                    } else
-                    {
-                        dummy.Enabled = false;
-                    }
-                }
-            }
-        }
-
+        /// <summary>
+        /// Deals with the click from the control buttons
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnCntrlClick(object sender, EventArgs e)
         {
             if (GetSelectedTile() == null)
@@ -303,6 +314,11 @@ namespace Assignment2
         #endregion
 
         #region Movement
+        /// <summary>
+        /// Checks if the neighbour from a tile is empty
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <returns>true if empty / null / tag = 0</returns>
         private bool IsNeighbourEmpty(string direction)
         {
             shouldMove = true;
@@ -404,12 +420,19 @@ namespace Assignment2
 
             return shouldMove;
         }
+        /// <summary>
+        /// Deletes the selected tile from the array / control panel
+        /// </summary>
         private void DeleteSelectedTile()
         {
 
             pnlLoadTiles.Controls.Remove(picBoxMapping[originalXPos, originalYPos]);
             picBoxMapping[originalXPos, originalYPos] = null;
         }
+        /// <summary>
+        /// Checks if the collided door matches with the collided box
+        /// </summary>
+        /// <returns>True if dooe and box match</returns>
         private bool DoesDoorMatch()
         {
             if (picBoxMapping[originalXPos, originalYPos].Tag.Equals(3) && picBoxMapping[checkingX, checkingY].Tag.Equals(2)
@@ -418,12 +441,18 @@ namespace Assignment2
 
             return false;
         }
+        /// <summary>
+        /// Updates the PictureBox array
+        /// </summary>
         private void UpdatePicBoxMappingArray()
         {
             picBoxMapping[checkingX, checkingY] = GetSelectedTile();
             //UpdateSelectedBox(picBoxMapping[checkingX, checkingY]);
             picBoxMapping[originalXPos, originalYPos] = null;
         }
+        /// <summary>
+        /// Updates the current selected tile location
+        /// </summary>
         private void UpdateSelectedBoxLocation()
         {
             picBoxMapping[originalXPos, originalYPos].Top = checkingX * SIZE;
@@ -434,6 +463,9 @@ namespace Assignment2
         #endregion
 
         #region Updating Info
+        /// <summary>
+        /// Updates the amount of boxes remaining on the grid
+        /// </summary>
         private void UpdateRemainingBoxes()
         {
             boxesRemaining = 0;
@@ -450,6 +482,9 @@ namespace Assignment2
             }
             txtNumbBoxes.Text = boxesRemaining.ToString();
         }
+        /// <summary>
+        /// Checks if the amount of remaing boxes is 0
+        /// </summary>
         private void CheckWinner()
         {
             if (boxesRemaining == 0)
@@ -457,6 +492,9 @@ namespace Assignment2
                 ShowWinScreen();
             }
         }
+        /// <summary>
+        /// Shows a message notifying the victory
+        /// </summary>
         private void ShowWinScreen()
         {
             StringBuilder sb = new StringBuilder();
@@ -465,11 +503,17 @@ namespace Assignment2
             MessageBox.Show(sb.ToString(), "You won!", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ClearMap();
         }
+        /// <summary>
+        /// Clears all the controls from the panel
+        /// </summary>
         private void ClearMap()
         {
             pnlLoadTiles.Controls.Clear();
             ChangeEnabledControlButtons(false);
         }
+        /// <summary>
+        /// Updates the amount of movements 
+        /// </summary>
         private void UpdateMoves()
         {
             if (pastMovement != currentMovement)
@@ -479,6 +523,9 @@ namespace Assignment2
             currentMovement = pastMovement;
             txtNumbMoves.Text = movements.ToString();
         }
+        /// <summary>
+        /// Prints the .Tyle property from the picBoxMapping array (debbugin)
+        /// </summary>
         private void PrintTilesArray()
         {
             for (int i = 0; i < ROWS; i++)
