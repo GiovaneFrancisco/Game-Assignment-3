@@ -125,7 +125,14 @@ namespace Assignment2
         /// <param name="e"></param>
         private void btnGenerateMap_Click(object sender, EventArgs e)
         {
+            if (HasCreatedMap()) ClearMap();
+
             if (ShouldCreateMap()) GenerateTiles();
+        }
+
+        private void ClearMap()
+        {
+            pnlMap.Controls.Clear();
         }
 
         /// <summary>
@@ -139,10 +146,6 @@ namespace Assignment2
         {
             rows = int.Parse(txtRows.Text);
             columns = int.Parse(txtColumns.Text);
-
-            //GenerateTiles();
-            pnlMap.Width = 64 * rows;
-            pnlMap.Height = 64 * columns;
             if (pnlMap.Controls.Count > 0)
             {
                 foreach (Control item in pnlMap.Controls.OfType<PictureBox>())
@@ -163,16 +166,13 @@ namespace Assignment2
                     picBox.Size = new System.Drawing.Size(none.Size.Width, none.Size.Height);
                     picBox.BorderStyle = BorderStyle.FixedSingle;
                     picBox.Click += new EventHandler(ChangeSelectedTile);
-                    //picBox.Click += new EventHandler(PicInfo);
                     picBox.Name = "None";
                     picBox.Tag = 0;
                     pnlMap.Controls.Add(picBox);
                     tileMapping[row, column] = null;
-
                 }
             }
             pnlResources.Visible = true;
-            btnGenerateMap.Visible = false;
         }
 
         /// <summary>
@@ -372,45 +372,41 @@ namespace Assignment2
         /// </summary>
         private void UpdateSaveMessage()
         {
+            bool save = true;
             saveMessage.Clear();
             saveTitle.Clear();
 
             saveTitle.Append("Error saving the map");
             saveIcon = MessageBoxIcon.Error;
-            if (CountGreenBox(picturesList) != CountGreenDoor(picturesList))
-            {
-                saveMessage.AppendLine("Green Door count and Green Box count should be the same!");
-                saveMessage.AppendLine($"Green Door count: {countGreenDoor}");
-                saveMessage.AppendLine($"Green Box count: {countGreenBox}");
-            }
 
-            if (CountRedBox(picturesList) != CountRedDoor(picturesList))
+            CountTotalBoxesDoors(picturesList);
+            if (!HasCreatedMap())
             {
-                saveMessage.AppendLine("Red Door count and Red Box count should be the same!");
-                saveMessage.AppendLine($"Red Door count: {countRedDoor}");
-                saveMessage.AppendLine($"Red Box count: {countRedBox}");
+                save = false;
+                saveMessage.AppendLine("You must create a map before saving it!");
             } else
             {
+
+
                 if (countGreenBox == 0 || countGreenDoor == 0 || countRedBox == 0 || countRedDoor == 0)
                 {
-
-                    if (countGreenBox == 0)
+                    if (countGreenDoor == 0 && countRedDoor == 0)
                     {
+                        save = false;
+                        saveMessage.AppendLine("There should be at least one Door and one matching Box");
+                    }
+                    if (countGreenDoor != 0 && countGreenBox == 0)
+                    {
+                        save = false;
                         saveMessage.AppendLine("There should be at least one Green Box");
                     }
-                    if (countGreenDoor == 0)
+                    if (countRedDoor != 0 && countRedBox == 0)
                     {
-                        saveMessage.AppendLine("There should be at least one Green Door");
-                    }
-                    if (countRedBox == 0)
-                    {
+                        save = false;
                         saveMessage.AppendLine("There should be at least one Red Box");
                     }
-                    if (countRedDoor == 0)
-                    {
-                        saveMessage.AppendLine("There should be at least one Red Door");
-                    }
-                } else
+                }
+                if (save)
                 {
                     saveTitle.Clear();
                     saveTitle.Append("Map saved successfully");
@@ -423,6 +419,30 @@ namespace Assignment2
             }
         }
 
+        private void CountTotalBoxesDoors(List<PictureBox> picturesList)
+        {
+            countGreenBox = 0;
+            countGreenDoor = 0;
+            countRedBox = 0;
+            countRedDoor = 0;
+            foreach (PictureBox pic in picturesList)
+            {
+                if ((int)pic.Tag == 2)
+                {
+                    countRedDoor++;
+                } else if ((int)pic.Tag == 3)
+                {
+                    countRedBox++;
+                } else if ((int)pic.Tag == 4)
+                {
+                    countGreenDoor++;
+                } else if ((int)pic.Tag == 5)
+                {
+                    countGreenBox++;
+                }
+            }
+        }
+
         /// <summary>
         /// Checks if the map should be saved or not
         /// </summary>
@@ -430,14 +450,28 @@ namespace Assignment2
         /// <returns>true if should be saved</returns>
         private bool ShouldSaveMap(List<PictureBox> picList)
         {
-            if (CountGreenBox(picList) != CountGreenDoor(picList) ||
-                CountRedBox(picList) != CountRedDoor(picList)
-                || CountGreenBox(picList) == 0 || CountGreenDoor(picList) == 0 ||
-                CountRedBox(picList) == 0 || CountRedDoor(picList) == 0)
+            CountTotalBoxesDoors(picList);
+            if (countGreenDoor == 0 && countRedDoor == 0 || !HasCreatedMap())
             {
+
                 return false;
+            } else
+            {
+                if (countGreenDoor != 0 && countGreenBox == 0 || countRedDoor != 0 && countRedBox == 0)
+                {
+                    return false;
+                }
             }
             return true;
+        }
+
+        private bool HasCreatedMap()
+        {
+            foreach (Control control in pnlMap.Controls)
+            {
+                if (control != null) return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -457,60 +491,6 @@ namespace Assignment2
             }
         }
 
-        /// <summary>
-        /// Counts how many Red Door tiles are in the grid
-        /// Updates the countRedDoor variable
-        /// </summary>
-        /// <param name="picList"></param>
-        private int CountRedDoor(List<PictureBox> picList)
-        {
-            countRedDoor = 0;
-            foreach (PictureBox pic in picList)
-            {
-                if ((int)pic.Tag == 2)
-                {
-                    countRedDoor++;
-                }
-            }
-            return countRedDoor;
-        }
-
-        /// <summary>
-        /// Counts how many Red Box tiles are in the grid
-        /// Updates the countRedBox variable
-        /// </summary>
-        /// <param name="picList"></param>
-        private int CountRedBox(List<PictureBox> picList)
-        {
-            countRedBox = 0;
-            foreach (PictureBox pic in picList)
-            {
-                if ((int)pic.Tag == 3)
-                {
-                    countRedBox++;
-                }
-            }
-            return countRedBox;
-        }
-
-        /// <summary>
-        /// Counts how many Green Door tiles are in the grid
-        /// Updates the countGreenDoor variable
-        /// </summary>
-        /// <param name="picList"></param>
-        private int CountGreenDoor(List<PictureBox> picList)
-        {
-            countGreenDoor = 0;
-            foreach (PictureBox pic in picList)
-            {
-                if ((int)pic.Tag == 4)
-                {
-                    countGreenDoor++;
-                }
-            }
-            return countGreenDoor;
-        }
-
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PictureBox picBox;
@@ -527,25 +507,6 @@ namespace Assignment2
             CountWall(picturesList);
             UpdateSaveMessage();
             ShowSaveMessage();
-        }
-
-
-        /// <summary>
-        /// Counts how many Green Box tiles are in the grid
-        /// Updates the countGreenBox variable
-        /// </summary>
-        /// <param name="picList"></param>
-        private int CountGreenBox(List<PictureBox> picList)
-        {
-            countGreenBox = 0;
-            foreach (PictureBox pic in picList)
-            {
-                if ((int)pic.Tag == 5)
-                {
-                    countGreenBox++;
-                }
-            }
-            return countGreenBox;
         }
 
         /// <summary>
@@ -620,6 +581,12 @@ namespace Assignment2
                         }
                     }
                 }
+            } else
+            {
+                saveTitle.Clear();
+                saveTitle.Append("Map saved successfully");
+                saveMessage.Append("Map not saved");
+                saveIcon = MessageBoxIcon.Information;
             }
         }
 

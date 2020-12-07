@@ -198,13 +198,12 @@
             // timer1
             // 
             this.timer1.Interval = 500;
-            this.timer1.Tick += new System.EventHandler(this.TimerTick);
             // 
             // PlayQGameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 479);
+            this.ClientSize = new System.Drawing.Size(800, 473);
             this.Controls.Add(this.pnlCntrlButtons);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.pnlLoadTiles);
